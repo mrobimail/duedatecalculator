@@ -10,7 +10,7 @@ function calculateDueDate(submitDate, turnaroundTime) {
     const firstDayEndTimestamp = Math.floor(firstDayEnd / 1000);
 
     const submitDateTimestamp = Math.floor(new Date(submitDate) / 1000);
-    const firstDayRemainder = firstDayWorkingHoursEndTimestamp - submitDateTimestamp;
+    const firstDayRemainder = firstDayWorkingHoursEndTimestamp - submitDateTimestamp + 3600;
     const turnaroundTimeInSeconds = turnaroundTime * 60 * 60;
 
     const resultSecondsInFirstDay = firstDayEndTimestamp - submitDateTimestamp;
@@ -82,7 +82,7 @@ function getResultSecondsIfMoreDay(submitDate, turnaroundTimeAfterFirstDay) {
         } else if (i >= workingHours) {
             resultSeconds += oneDayInSeconds;
         } else {
-            resultSeconds += (config.workingHours.from * 60 * 60) + (i * 60 * 60);
+            resultSeconds += (config.workingHours.from * 60 * 60) + (i * 60 * 60) + 3600;
         }
     }
 
@@ -94,4 +94,7 @@ function isWeekend(date) {
     return dayNumber === 0 || dayNumber === 6;
 }
 
-module.exports = calculateDueDate;
+module.exports = {
+    calculateDueDate,
+    isWeekend
+};
