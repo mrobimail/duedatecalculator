@@ -1,0 +1,23 @@
+{
+  "name": "duedatecalculator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "mocha 'tests/**/*.js' --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrobimail/duedatecalculator.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mrobimail/duedatecalculator/issues"
+  },
+  "homepage": "https://github.com/mrobimail/duedatecalculator#readme",
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "mocha": "^9.1.4"
+  }
+}
