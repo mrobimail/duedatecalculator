@@ -1,17 +1,27 @@
+const config = require('../config.json');
+
 function calculateDueDate(submitDate, turnaroundTime) {
     validateInputData(submitDate, turnaroundTime);
     
-    const firstDayEnd = new Date(submitDate).setHours(17);
-    const submitDateTimestamp = Math.floor(new Date(submitDate) / 1000);
+    const firstDayWorkingHoursEnd = new Date(submitDate).setHours(config.workingHours.to, 0, 0);
+    const firstDayWorkingHoursEndTimestamp = Math.floor(firstDayWorkingHoursEnd / 1000);
+
+    const firstDayEnd = new Date(submitDate).setHours(24, 0, 0);
     const firstDayEndTimestamp = Math.floor(firstDayEnd / 1000);
-    const firstDayRemainder = firstDayEndTimestamp - submitDateTimestamp;
+
+    const submitDateTimestamp = Math.floor(new Date(submitDate) / 1000);
+    const firstDayRemainder = firstDayWorkingHoursEndTimestamp - submitDateTimestamp;
     const turnaroundTimeInSeconds = turnaroundTime * 60 * 60;
+
+    const resultSecondsInFirstDay = firstDayEndTimestamp - submitDateTimestamp;
+    const turnaroundTimeAfterFirstDay = turnaroundTime - (firstDayRemainder / 60 / 60);
 
     let resultSeconds;
     if (turnaroundTimeInSeconds <= firstDayRemainder) {
         resultSeconds = submitDateTimestamp + turnaroundTimeInSeconds;
     } else {
-        resultSeconds = getResultSecondsIfMoreDay(submitDate, turnaroundTime);
+        resultSeconds = resultSecondsInFirstDay;
+        resultSeconds += getResultSecondsIfMoreDay(submitDate, turnaroundTimeAfterFirstDay);
     }
 
     const resultDate = new Date(resultSeconds * 1000).toISOString();
@@ -58,19 +68,21 @@ function isIsoDate(str) {
     return returnVal;
 }
 
-function getResultSecondsIfMoreDay(submitDate, turnaroundTime) {
-    // TO DO: Add first day
+function getResultSecondsIfMoreDay(submitDate, turnaroundTimeAfterFirstDay) {
     let resultSeconds = Math.floor(new Date(submitDate) / 1000);
+    let workingHours = config.workingHours.to - config.workingHours.from;
+    let oneDayInSeconds = 24 * 60 * 60;
     let day = new Date(submitDate);
-    for (let i = turnaroundTime; i > 0; i -= 8) {
+
+    for (let i = turnaroundTimeAfterFirstDay; i > 0; i -= workingHours) {
         day.setDate(day.getDate() + 1);
         if (isWeekend(day)) {
-            resultSeconds += 24 * 60 * 60;
-            i += 8;
-        } else if (i >= 8) {
-            resultSeconds += 24 * 60 * 60;
+            resultSeconds += oneDayInSeconds;
+            i += workingHours;
+        } else if (i >= workingHours) {
+            resultSeconds += oneDayInSeconds;
         } else {
-            resultSeconds += (9 * 60 * 60) + (i * 60 * 60);
+            resultSeconds += (config.workingHours.from * 60 * 60) + (i * 60 * 60);
         }
     }
 
